@@ -1,0 +1,596 @@
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f2ede6;
+      --fire: #e84c1e;
+      --gold: #f5c842;
+      --mist: #c8c0b5;
+      --white: #faf8f4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── CURSOR DOT ── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--fire);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.4rem 3rem;
+      mix-blend-mode: multiply;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--fire);
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 12vw, 11rem);
+      line-height: 0.9;
+      color: var(--ink);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.4s forwards;
+    }
+
+    .hero-name span { color: var(--fire); }
+
+    .hero-tagline {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      margin-top: 1.5rem;
+      color: var(--ink);
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.6s forwards;
+      max-width: 380px;
+      line-height: 1.5;
+    }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      opacity: 0;
+      animation: fadeUp 0.9s ease 0.8s forwards;
+    }
+
+    .hero-image-inner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top; /* adjust to 'center' or 'top' based on your photo */
+        display: block;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      border: 2px solid var(--ink);
+    }
+    .btn:hover { background: var(--fire); border-color: var(--fire); transform: translate(-3px, -3px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      margin-left: 1rem;
+    }
+    .btn-outline:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-image-block {
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 0.5s forwards;
+    }
+
+    .hero-image-inner {
+      width: 70%; aspect-ratio: 3/4;
+      background: linear-gradient(135deg, #2a2218 0%, #4a3828 40%, #1a1210 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+     /* .hero-image-inner::after { */
+      /* content: './Assets/Profile/header.jpg'; */
+      /* white-space: pre; */
+      /* font-family: 'Bebas Neue', sans-serif; */
+      /* font-size: 1.8rem; */
+      /* letter-spacing: 0.15em; */
+      /* color: rgba(255,255,255,0.15); */
+      /* position: absolute; inset: 0; */
+      /* display: flex; align-items: center; justify-content: center; */
+      /* text-align: center; */
+    /* }  */
+    
+
+    .hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      opacity: 0.4;
+      animation: bounce 2s infinite;
+    }
+    .hero-scroll::after {
+      content: '';
+      display: block; width: 1px; height: 40px;
+      background: var(--ink);
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-strip {
+      background: var(--fire);
+      color: var(--paper);
+      padding: 0.9rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .marquee-inner {
+      display: inline-flex; gap: 3rem;
+      animation: marquee 18s linear infinite;
+    }
+
+    .marquee-inner span {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.15em;
+    }
+
+    .marquee-dot { color: var(--gold); }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 7rem 3rem; }
+
+    .section-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--fire);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 1;
+      color: var(--ink);
+      margin-bottom: 3rem;
+    }
+
+    /* ── ABOUT ── */
+    .about {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about-visual {
+      position: relative;
+    }
+
+    .about-box {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--ink);
+      position: relative;
+    }
+
+    .about-box::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border: 2px solid var(--fire);
+      z-index: -1;
+      transition: inset 0.3s;
+    }
+    .about-box:hover::before { inset: -20px; }
+
+    .about-box-inner {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #1a1210, #2e2018);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.1);
+      text-align: center;
+    }
+    
+    .about-box-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top; /* adjust to 'center' or 'top' based on your photo */
+      display: block;
+    }
+
+    .about-number {
+      position: absolute;
+      bottom: -1.5rem; right: -1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 6rem;
+      color: var(--gold);
+      opacity: 0.3;
+      line-height: 1;
+    }
+
+    .about-text p {
+      font-size: 0.9rem;
+      line-height: 1.9;
+      opacity: 0.75;
+      margin-bottom: 1.5rem;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+      border-top: 1px solid var(--mist);
+      padding-top: 2rem;
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      color: var(--fire);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-top: 0.3rem;
+    }
+
+    /* ── WORK ── */
+    #work { background: var(--ink); color: var(--paper); }
+    #work .section-title { color: var(--paper); }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .work-card {
+      position: relative; overflow: hidden;
+      cursor: pointer;
+      background: #1a1a1a;
+    }
+
+    .work-card:nth-child(1) { grid-column: span 7; }
+    .work-card:nth-child(2) { grid-column: span 5; }
+    .work-card:nth-child(3) { grid-column: span 4; }
+    .work-card:nth-child(4) { grid-column: span 8; }
+
+    .work-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .work-thumb-inner {
+      width: 100%; height: 100%;
+      transition: transform 0.5s ease;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.12);
+    }
+
+    .work-thumb-inner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top; /* adjust to 'center' or 'top' based on your photo */
+        display: block;
+    }
+
+    .work-card:hover .work-thumb-inner { transform: scale(1.06); }
+
+    .work-thumb-inner.t1 { background: linear-gradient(135deg, #e84c1e22, #e84c1e55); }
+    .work-thumb-inner.t2 { background: linear-gradient(135deg, #f5c84222, #f5c84244); }
+    .work-thumb-inner.t3 { background: linear-gradient(135deg, #4455aa22, #4455aa44); }
+    .work-thumb-inner.t4 { background: linear-gradient(135deg, #22aa5522, #22aa5544); }
+
+    .work-overlay {
+      position: absolute; inset: 0;
+      background: var(--fire);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 1.8rem;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .work-card:hover .work-overlay { opacity: 0.95; }
+
+    .work-overlay-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.05em;
+      color: var(--paper);
+    }
+
+    .work-overlay-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      margin-top: 0.3rem;
+    }
+
+    .work-info { padding: 1.2rem; }
+    .work-info-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      color: var(--paper);
+    }
+    .work-info-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.4;
+      margin-top: 0.2rem;
+    }
+
+    /* ── SERVICES ── */
+    #services { background: var(--white); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      border: 1px solid var(--mist);
+    }
+
+    .service-item {
+      padding: 3rem 2.5rem;
+      border-right: 1px solid var(--mist);
+      border-bottom: 1px solid var(--mist);
+      transition: background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--fire);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .service-item:hover::before { transform: scaleX(1); }
+    .service-item:hover { background: #faf7f0; }
+
+    .service-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: var(--mist);
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .service-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .service-desc {
+      font-size: 0.8rem;
+      line-height: 1.8;
+      opacity: 0.6;
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--ink);
+      color: var(--paper);
+      text-align: center;
+      padding: 8rem 3rem;
+    }
+
+    #contact .section-tag { color: var(--gold); }
+    #contact .section-title { color: var(--paper); margin-bottom: 1rem; }
+
+    .contact-sub {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      opacity: 0.6;
+      margin-bottom: 3rem;
+    }
+
+    .contact-email {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 6vw, 5rem);
+      color: var(--fire);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      display: inline-block;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .contact-email::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .contact-email:hover::after { transform: scaleX(1); }
+    .contact-email:hover { color: var(--gold); }
+
+    .contact-socials {
+      display: flex; justify-content: center; gap: 2rem;
+      margin-top: 3.5rem;
+      list-style: none;
+    }
+
+    .contact-socials a {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--paper);
+      text-decoration: none;
+      opacity: 0.4;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .contact-socials a:hover { opacity: 1; color: var(--fire); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      border-top: 1px solid #222;
+      padding: 1.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--paper);
+    }
+    footer p { font-size: 0.65rem; opacity: 0.3; letter-spacing: 0.15em; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .about { grid-template-columns: 1fr; gap: 3rem; }
+      .work-card:nth-child(n) { grid-column: span 12; }
+      .services-grid { grid-template-columns: 1fr; }
+      nav { padding: 1.2rem 1.5rem; }
+      section { padding: 5rem 1.5rem; }
+    }
