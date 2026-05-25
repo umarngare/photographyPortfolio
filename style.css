@@ -393,6 +393,14 @@
     .work-thumb-inner.t3 { background: linear-gradient(135deg, #4455aa22, #4455aa44); }
     .work-thumb-inner.t4 { background: linear-gradient(135deg, #22aa5522, #22aa5544); }
 
+    .work-thumb-inner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top; /* adjust to 'center' or 'top' based on your photo */
+        display: block;
+    }
+
     .work-overlay {
       position: absolute; inset: 0;
       background: var(--fire);
