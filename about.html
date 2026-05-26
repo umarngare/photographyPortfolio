@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — Your Name</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:   #0d0d0d;
+      --paper: #f2ede6;
+      --fire:  #e84c1e;
+      --gold:  #f5c842;
+      --mist:  #c8c0b5;
+      --white: #faf8f4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--fire); border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.4rem 3rem;
+      mix-blend-mode: multiply;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; letter-spacing: 0.1em;
+      color: var(--ink); text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--ink);
+      text-decoration: none; opacity: 0.6; transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-links a.active {
+      opacity: 1; border-bottom: 2px solid var(--fire); padding-bottom: 2px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: var(--ink);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative; overflow: hidden;
+    }
+
+    /* Large ghost text behind everything */
+    .hero-ghost {
+      position: absolute;
+      bottom: -3rem; left: -1rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 20vw, 18rem);
+      color: rgba(255,255,255,0.03);
+      letter-spacing: 0.02em;
+      line-height: 1; pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 8rem 3.5rem 5rem;
+      position: relative; z-index: 2;
+    }
+
+    .hero-label {
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--fire);
+      margin-bottom: 1rem;
+      opacity: 0; animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4.5rem, 10vw, 9.5rem);
+      line-height: 0.88; color: var(--paper);
+      opacity: 0; animation: fadeUp 0.8s ease 0.35s forwards;
+    }
+    .hero-title span { color: var(--fire); }
+
+    .hero-intro {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 1.8vw, 1.35rem);
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6; margin-top: 1.8rem; max-width: 400px;
+      opacity: 0; animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .hero-divider {
+      width: 60px; height: 2px; background: var(--fire);
+      margin: 2rem 0;
+      opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    .hero-quick-facts {
+      display: flex; flex-direction: column; gap: 0.6rem;
+      opacity: 0; animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+
+    .fact {
+      display: flex; align-items: center; gap: 0.9rem;
+      font-size: 0.68rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.45);
+    }
+    .fact-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--fire); flex-shrink: 0;
+    }
+
+    .hero-right {
+      position: relative; overflow: hidden;
+    }
+
+    .hero-photo-frame {
+      position: absolute; inset: 0;
+      clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+      background: #1a1210;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; animation: fadeIn 1.2s ease 0.4s forwards;
+    }
+
+    .hero-photo-inner {
+      width: 75%; aspect-ratio: 3/4;
+      background: linear-gradient(160deg, #2a1f15 0%, #1a1210 100%);
+      position: relative; overflow: hidden;
+    }
+
+    .hero-photo-inner img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center top;
+      display: block;
+    }
+
+    /* Placeholder label */
+    .hero-photo-inner::after {
+      content: 'YOUR\APHOTO';
+      white-space: pre;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.08);
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+
+    /* Accent stripe */
+    .hero-photo-frame::after {
+      content: '';
+      position: absolute; top: 0; left: 10%; width: 3px; height: 100%;
+      background: var(--fire);
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-strip {
+      background: var(--fire); padding: 0.9rem 0;
+      overflow: hidden; white-space: nowrap;
+    }
+    .marquee-inner {
+      display: inline-flex; gap: 3rem;
+      animation: marquee 20s linear infinite;
+    }
+    .marquee-inner span {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 0.15em;
+    }
+    .marquee-dot { color: var(--gold); }
+
+    /* ── SECTION BASE ── */
+    section { padding: 7rem 3rem; }
+
+    .section-tag {
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--fire);
+      margin-bottom: 0.8rem; display: block;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 1; color: var(--ink); margin-bottom: 3rem;
+    }
+
+    /* ── STORY SECTION ── */
+    #story { background: var(--white); }
+
+    .story-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 6rem; align-items: start;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .story-sticky {
+      position: sticky; top: 8rem;
+    }
+
+    .story-year-block {
+      margin-bottom: 2.5rem;
+    }
+
+    .year-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem; color: var(--mist);
+      line-height: 1; display: block;
+    }
+
+    .year-label {
+      font-size: 0.65rem; letter-spacing: 0.25em;
+      text-transform: uppercase; opacity: 0.4;
+    }
+
+    .story-image-stack { position: relative; }
+
+    .story-img-main {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: linear-gradient(140deg, #1a1210, #2e2018);
+      position: relative; overflow: hidden;
+    }
+
+    .story-img-main img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+
+    .story-img-main::after {
+      content: 'YOUR PORTRAIT';
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.1);
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .story-img-accent {
+      position: absolute; bottom: -2rem; right: -2rem;
+      width: 55%; aspect-ratio: 1;
+      background: var(--fire);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      z-index: 2;
+    }
+
+    .accent-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem; color: var(--paper); line-height: 1;
+    }
+    .accent-label {
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.7);
+    }
+
+    /* Timeline entries */
+    .story-entries { display: flex; flex-direction: column; gap: 4rem; }
+
+    .story-entry { position: relative; padding-left: 2rem; }
+
+    .story-entry::before {
+      content: '';
+      position: absolute; left: 0; top: 0.4rem;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--fire);
+    }
+
+    .story-entry::after {
+      content: '';
+      position: absolute; left: 3.5px; top: 1.2rem;
+      width: 1px; bottom: -3.5rem;
+      background: var(--mist);
+    }
+
+    .story-entry:last-child::after { display: none; }
+
+    .entry-period {
+      font-size: 0.62rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: var(--fire);
+      margin-bottom: 0.5rem;
+    }
+
+    .entry-heading {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem; margin-bottom: 0.9rem; line-height: 1.2;
+    }
+
+    .entry-body {
+      font-size: 0.82rem; line-height: 1.95; opacity: 0.65;
+    }
+
+    /* ── TOOLS / SOFTWARE ── */
+    #tools { background: var(--ink); }
+    #tools .section-title { color: var(--paper); }
+    #tools .section-tag { color: var(--gold); }
+
+    .tools-intro {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.2rem; color: rgba(255,255,255,0.45);
+      max-width: 520px; line-height: 1.7;
+      margin-bottom: 4rem;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #222;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .tool-card {
+      background: #0d0d0d;
+      padding: 2.8rem 2.5rem;
+      position: relative; overflow: hidden;
+      transition: background 0.3s;
+    }
+
+    .tool-card:hover { background: #141414; }
+
+    .tool-card::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.35s ease;
+    }
+
+    .tool-card:nth-child(1)::before { background: #4a90d9; }
+    .tool-card:nth-child(2)::before { background: #31a8ff; }
+    .tool-card:nth-child(3)::before { background: #ff7c00; }
+    .tool-card:nth-child(4)::before { background: #9999ff; }
+    .tool-card:nth-child(5)::before { background: var(--fire); }
+
+    .tool-card:hover::before { transform: scaleX(1); }
+
+    .tool-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem; letter-spacing: 0.05em;
+    }
+
+    .tool-card:nth-child(1) .tool-icon { background: rgba(74,144,217,0.15); color: #4a90d9; }
+    .tool-card:nth-child(2) .tool-icon { background: rgba(49,168,255,0.15); color: #31a8ff; }
+    .tool-card:nth-child(3) .tool-icon { background: rgba(255,124,0,0.15);   color: #ff7c00; }
+    .tool-card:nth-child(4) .tool-icon { background: rgba(153,153,255,0.15); color: #9999ff; }
+    .tool-card:nth-child(5) .tool-icon { background: rgba(232,76,30,0.15);   color: var(--fire); }
+
+    .tool-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem; letter-spacing: 0.05em;
+      color: var(--paper); margin-bottom: 0.3rem;
+    }
+
+    .tool-category {
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      margin-bottom: 1.2rem;
+    }
+
+    .tool-desc {
+      font-size: 0.78rem; line-height: 1.85;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .tool-skill-bar {
+      margin-top: 1.8rem;
+      height: 2px; background: #222; position: relative;
+    }
+
+    .tool-skill-fill {
+      position: absolute; top: 0; left: 0; height: 100%;
+      width: 0;
+      transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+    }
+
+    .tool-card:nth-child(1) .tool-skill-fill { background: #4a90d9; }
+    .tool-card:nth-child(2) .tool-skill-fill { background: #31a8ff; }
+    .tool-card:nth-child(3) .tool-skill-fill { background: #ff7c00; }
+    .tool-card:nth-child(4) .tool-skill-fill { background: #9999ff; }
+    .tool-card:nth-child(5) .tool-skill-fill { background: var(--fire); }
+
+    .tool-skill-label {
+      position: absolute; right: 0; top: -1.4rem;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ── PHILOSOPHY ── */
+    #philosophy { background: var(--paper); overflow: hidden; }
+
+    .philosophy-layout {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+    }
+
+    .philosophy-quotes { display: flex; flex-direction: column; gap: 3rem; }
+
+    .quote-block {
+      padding: 2.5rem;
+      border-left: 3px solid var(--mist);
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .quote-block:hover { border-color: var(--fire); }
+
+    .quote-text {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.15rem; line-height: 1.65;
+      color: var(--ink); margin-bottom: 1rem;
+    }
+
+    .quote-attr {
+      font-size: 0.62rem; letter-spacing: 0.25em;
+      text-transform: uppercase; opacity: 0.4;
+    }
+
+    .philosophy-visual {
+      position: relative;
+    }
+
+    .philosophy-big-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.9; color: var(--ink);
+    }
+
+    .philosophy-big-text em {
+      color: var(--fire); font-style: normal;
+      display: block;
+    }
+
+    .philosophy-body {
+      font-size: 0.82rem; line-height: 1.95;
+      opacity: 0.6; margin-top: 2rem; max-width: 420px;
+    }
+
+    .philosophy-tags {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      margin-top: 2rem;
+    }
+
+    .ptag {
+      padding: 0.4rem 1rem;
+      border: 1px solid var(--mist);
+      font-size: 0.62rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--ink);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .ptag:hover { background: var(--fire); border-color: var(--fire); color: var(--paper); }
+
+    /* ── NUMBERS BAND ── */
+    .numbers-band {
+      background: var(--fire); padding: 4rem 3rem;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; background: var(--fire);
+    }
+
+    .number-item {
+      background: var(--fire);
+      padding: 2rem; text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    .number-item:last-child { border-right: none; }
+
+    .number-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5rem);
+      color: var(--paper); line-height: 1;
+      display: block;
+    }
+
+    .number-label {
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65); margin-top: 0.4rem;
+    }
+
+    /* ── CTA ── */
+    .cta-strip {
+      background: var(--ink); padding: 5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .cta-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      color: var(--paper); line-height: 1;
+    }
+    .cta-text span { color: var(--fire); }
+
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.2rem;
+      background: var(--fire); color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; text-decoration: none;
+      border: 2px solid var(--fire);
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--gold); border-color: var(--gold); color: var(--ink); transform: translate(-3px,-3px); }
+
+    .btn-outline {
+      background: transparent; color: var(--paper);
+      border-color: rgba(255,255,255,0.3);
+      margin-left: 1rem;
+    }
+    .btn-outline:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink); border-top: 1px solid #222;
+      padding: 1.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--paper);
+    }
+    footer p { font-size: 0.65rem; opacity: 0.3; letter-spacing: 0.15em; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.75s ease, transform 0.75s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .story-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .story-sticky { position: static; }
+      .tools-grid { grid-template-columns: 1fr 1fr; }
+      .philosophy-layout { grid-template-columns: 1fr; }
+      .numbers-band { grid-template-columns: repeat(2, 1fr); }
+      .cta-strip { flex-direction: column; gap: 2.5rem; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 1.2rem 1.5rem; }
+      section, .cta-strip { padding: 5rem 1.5rem; }
+      .tools-grid { grid-template-columns: 1fr; }
+      .numbers-band { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="portfolio.html" class="nav-logo">YN</a>
+    <ul class="nav-links">
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="works.html">Work</a></li>
+      <li><a href="portfolio.html#services">Services</a></li>
+      <li><a href="portfolio.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-ghost">ABOUT</div>
+    <div class="hero-left">
+      <p class="hero-label">The Person Behind the Lens</p>
+      <h1 class="hero-title">Self-<br>Taught.<br><span>All In.</span></h1>
+      <p class="hero-intro">What started with curiosity and a camera became a lifelong obsession — turning ordinary moments into images that speak without words.</p>
+      <div class="hero-divider"></div>
+      <div class="hero-quick-facts">
+        <div class="fact"><div class="fact-dot"></div>Photographer &amp; Videographer</div>
+        <div class="fact"><div class="fact-dot"></div>Self-Taught — Started as a Hobby</div>
+        <div class="fact"><div class="fact-dot"></div>Capture One · Adobe Suite Specialist</div>
+        <div class="fact"><div class="fact-dot"></div>Available for Commissions &amp; Collaborations</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-photo-frame">
+        <div class="hero-photo-inner">
+          <!-- Replace with: <img src="your-photo.jpg" alt="Your Name"> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      <span>Photography</span><span class="marquee-dot">✦</span>
+      <span>Videography</span><span class="marquee-dot">✦</span>
+      <span>Color Grading</span><span class="marquee-dot">✦</span>
+      <span>Post Production</span><span class="marquee-dot">✦</span>
+      <span>Visual Storytelling</span><span class="marquee-dot">✦</span>
+      <span>Photography</span><span class="marquee-dot">✦</span>
+      <span>Videography</span><span class="marquee-dot">✦</span>
+      <span>Color Grading</span><span class="marquee-dot">✦</span>
+      <span>Post Production</span><span class="marquee-dot">✦</span>
+      <span>Visual Storytelling</span><span class="marquee-dot">✦</span>
+    </div>
+  </div>
+
+  <!-- STORY -->
+  <section id="story">
+    <div class="story-layout">
+
+      <!-- Sticky Left -->
+      <div class="story-sticky reveal">
+        <span class="section-tag">My Journey</span>
+        <h2 class="section-title">The<br>Story</h2>
+        <div class="story-image-stack">
+          <div class="story-img-main">
+            <!-- Replace with: <img src="your-story-photo.jpg" alt="Behind the scenes"> -->
+          </div>
+          <div class="story-img-accent">
+            <span class="accent-num">5+</span>
+            <span class="accent-label">Years Shooting</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Right -->
+      <div class="story-entries">
+
+        <div class="story-entry reveal">
+          <div class="entry-period">The Beginning</div>
+          <h3 class="entry-heading">It started with a borrowed camera and no plan.</h3>
+          <p class="entry-body">Like most self-taught creatives, there was no formal education, no structured curriculum — just a camera, an internet connection, and an unstoppable urge to figure things out. The first shots were rough. The framing was off, the exposure was wrong. But something clicked that wasn't just the shutter. The act of seeing — really seeing — the world through a lens felt different from anything else.</p>
+        </div>
+
+        <div class="story-entry reveal reveal-delay-1">
+          <div class="entry-period">Finding the Craft</div>
+          <h3 class="entry-heading">From snapshots to intentional storytelling.</h3>
+          <p class="entry-body">Hundreds of hours of self-study followed. Forums, YouTube deep-dives, trial and error at golden hour and in the dead of night. The hobby slowly became a discipline. Every shoot taught something new — about light, about patience, about the decisive moment. The camera became less of a tool and more of a language.</p>
+        </div>
+
+        <div class="story-entry reveal reveal-delay-2">
+          <div class="entry-period">Entering Video</div>
+          <h3 class="entry-heading">When a single frame wasn't enough.</h3>
+          <p class="entry-body">Still photography opened a door, but moving images blew the walls off entirely. Videography introduced a new dimension — time. Learning to compose for motion, to think in sequences, to marry visuals with sound. The editing suite became a second home; cutting footage, building rhythm, crafting the narrative arc that transforms raw clips into something cinematic.</p>
+        </div>
+
+        <div class="story-entry reveal reveal-delay-3">
+          <div class="entry-period">Going Professional</div>
+          <h3 class="entry-heading">The hobby became the work. The work became the calling.</h3>
+          <p class="entry-body">What began as a passion project gradually attracted attention. Commissions followed. Clients started seeking out this specific voice, this particular aesthetic. Going professional wasn't a conscious decision as much as an inevitable one — when the thing you love most also happens to be the thing you're good at, it would be a waste not to pursue it fully.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLS -->
+  <section id="tools">
+    <div style="max-width:1200px; margin:0 auto;">
+      <span class="section-tag reveal">The Toolkit</span>
+      <h2 class="section-title reveal">Software &amp;<br>Expertise</h2>
+      <p class="tools-intro reveal">Every tool in the arsenal has been mastered through years of hands-on use — not just learned, but truly understood.</p>
+
+      <div class="tools-grid reveal">
+
+        <div class="tool-card">
+          <div class="tool-icon">C1</div>
+          <div class="tool-name">Capture One</div>
+          <div class="tool-category">RAW Processing &amp; Tethering</div>
+          <p class="tool-desc">The industry's gold standard for RAW processing and tethered shooting. Used for precision colour editing, advanced masking, and achieving that signature film-like tonal quality that sets the work apart from the crowd.</p>
+          <div class="tool-skill-bar">
+            <span class="tool-skill-label">Expert</span>
+            <div class="tool-skill-fill" data-width="92%"></div>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">PS</div>
+          <div class="tool-name">Photoshop</div>
+          <div class="tool-category">Compositing &amp; Retouching</div>
+          <p class="tool-desc">Deep retouching, compositing, and creative image manipulation. From frequency separation skin retouching to full-scale photo composites — Photoshop is where raw captures are transformed into polished, final images.</p>
+          <div class="tool-skill-bar">
+            <span class="tool-skill-label">Expert</span>
+            <div class="tool-skill-fill" data-width="90%"></div>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">LR</div>
+          <div class="tool-name">Lightroom</div>
+          <div class="tool-category">Culling &amp; Batch Editing</div>
+          <p class="tool-desc">The backbone of any high-volume photo workflow. Lightroom handles culling, cataloguing, and batch colour grading at speed — keeping large client deliveries organised and consistent without sacrificing quality.</p>
+          <div class="tool-skill-bar">
+            <span class="tool-skill-label">Expert</span>
+            <div class="tool-skill-fill" data-width="95%"></div>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">AE</div>
+          <div class="tool-name">After Effects</div>
+          <div class="tool-category">Motion Graphics &amp; VFX</div>
+          <p class="tool-desc">Titles, transitions, motion graphics, and visual effects that bring video projects to another level. After Effects is used to add that cinematic finishing touch — the subtle detail that separates good video from truly memorable work.</p>
+          <div class="tool-skill-bar">
+            <span class="tool-skill-label">Advanced</span>
+            <div class="tool-skill-fill" data-width="80%"></div>
+          </div>
+        </div>
+
+        <div class="tool-card">
+          <div class="tool-icon">PR</div>
+          <div class="tool-name">Premiere Pro</div>
+          <div class="tool-category">Video Editing &amp; Colour</div>
+          <p class="tool-desc">End-to-end video editing: assembly cuts, narrative pacing, audio mixing, colour grading with Lumetri, and final export. Premiere is the engine that turns hours of raw footage into a tightly crafted story worth watching twice.</p>
+          <div class="tool-skill-bar">
+            <span class="tool-skill-label">Expert</span>
+            <div class="tool-skill-fill" data-width="93%"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- NUMBERS -->
+  <div class="numbers-band reveal">
+    <div class="number-item">
+      <span class="number-val">5+</span>
+      <div class="number-label">Years of Experience</div>
+    </div>
+    <div class="number-item">
+      <span class="number-val">50+</span>
+      <div class="number-label">Projects Completed</div>
+    </div>
+    <div class="number-item">
+      <span class="number-val">20+</span>
+      <div class="number-label">Happy Clients</div>
+    </div>
+    <div class="number-item">
+      <span class="number-val">5</span>
+      <div class="number-label">Tools Mastered</div>
+    </div>
+  </div>
+
+  <!-- PHILOSOPHY -->
+  <section id="philosophy">
+    <div class="philosophy-layout">
+      <div class="philosophy-quotes reveal">
+        <span class="section-tag">Creative Philosophy</span>
+        <div class="quote-block">
+          <p class="quote-text">"The best camera is the one that's with you — but the best photographer is the one who sees before they shoot."</p>
+          <span class="quote-attr">On instinct &amp; intention</span>
+        </div>
+        <div class="quote-block">
+          <p class="quote-text">"Post-production isn't a fix — it's a continuation of the creative vision that started the moment you picked up the camera."</p>
+          <span class="quote-attr">On the edit</span>
+        </div>
+        <div class="quote-block">
+          <p class="quote-text">"Being self-taught means you never stop being a student. There's no diploma to hide behind — only the work."</p>
+          <span class="quote-attr">On growth</span>
+        </div>
+      </div>
+
+      <div class="philosophy-visual reveal reveal-delay-2">
+        <div class="philosophy-big-text">
+          Light.<br>Motion.<br><em>Truth.</em>
+        </div>
+        <p class="philosophy-body">Every project starts with the same question: what is the truest version of this moment? Whether it's a still frame or a moving image, the goal is always the same — to make whoever sees it feel something real. No tricks. No shortcuts. Just craft, patience, and an obsession with getting it right.</p>
+        <div class="philosophy-tags">
+          <span class="ptag">Portraiture</span>
+          <span class="ptag">Landscape</span>
+          <span class="ptag">Documentary</span>
+          <span class="ptag">Commercial</span>
+          <span class="ptag">Cinematic Video</span>
+          <span class="ptag">Street</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-strip reveal">
+    <div class="cta-text">Ready to<br>make something <span>great?</span></div>
+    <div>
+      <a href="works.html" class="btn btn-outline">See My Work</a>
+      <a href="portfolio.html#contact" class="btn">Get in Touch</a>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Your Name. All rights reserved.</p>
+    <p>Designed with intent.</p>
+  </footer>
+
+  <script>
+    // ── Cursor ──
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .tool-card, .quote-block, .ptag').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(3)'; cursor.style.background = '#f5c842'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; cursor.style.background = '#e84c1e'; });
+    });
+
+    // ── Scroll reveal + skill bars ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('visible');
+
+        // Animate skill bars inside revealed cards
+        e.target.querySelectorAll('.tool-skill-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width;
+        });
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Also watch individual tool cards for bar animation
+    document.querySelectorAll('.tool-card').forEach(card => {
+      observer.observe(card);
+    });
+  </script>
+</body>
+</html>
