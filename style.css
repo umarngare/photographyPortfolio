@@ -49,14 +49,15 @@
       z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
       padding: 1.4rem 3rem;
-      mix-blend-mode: multiply;
+      /* mix-blend-mode: multiply; */
+      background: var(--fire);
     }
 
     .nav-logo {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.5rem;
       letter-spacing: 0.1em;
-      color: var(--ink);
+      color: var(--paper);
       text-decoration: none;
     }
 
@@ -65,7 +66,7 @@
       font-size: 0.7rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--ink);
+      color: var(--paper);
       text-decoration: none;
       opacity: 0.6;
       transition: opacity 0.2s;

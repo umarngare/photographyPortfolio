@@ -44,20 +44,21 @@
       z-index: 100;
       display: flex; justify-content: space-between; align-items: center;
       padding: 1.4rem 3rem;
-      mix-blend-mode: multiply;
+      /* mix-blend-mode: overlay; */
+      background: var(--fire);
     }
 
     .nav-logo {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 1.5rem; letter-spacing: 0.1em;
-      color: var(--ink); text-decoration: none;
+      color: var(--paper); text-decoration: none;
     }
 
     .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a {
       font-size: 0.7rem; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--ink);
-      text-decoration: none; opacity: 0.6; transition: opacity 0.2s;
+      text-transform: uppercase; color: var(--paper);
+      text-decoration: none; opacity: 1; transition: opacity 0.2s;
     }
     .nav-links a:hover, .nav-links a.active { opacity: 1; }
     .nav-links a.active { border-bottom: 2px solid var(--fire); padding-bottom: 2px; }
