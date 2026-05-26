@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Works — Your Name</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d0d0d;
+      --paper: #f2ede6;
+      --fire: #e84c1e;
+      --gold: #f5c842;
+      --mist: #c8c0b5;
+      --white: #faf8f4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Space Mono', monospace;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--fire);
+      border-radius: 50%;
+      position: fixed; pointer-events: none; z-index: 10000;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.4rem 3rem;
+      mix-blend-mode: multiply;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem; letter-spacing: 0.1em;
+      color: var(--ink); text-decoration: none;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--ink);
+      text-decoration: none; opacity: 0.6; transition: opacity 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { opacity: 1; }
+    .nav-links a.active { border-bottom: 2px solid var(--fire); padding-bottom: 2px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      min-height: 42vh;
+      background: var(--ink);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 7rem 3rem 3.5rem;
+      position: relative; overflow: hidden;
+    }
+
+    .page-header::after {
+      content: 'PHOTOGRAPHY';
+      position: absolute;
+      right: -1rem; bottom: -2rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 18vw, 14rem);
+      color: rgba(255,255,255,0.04);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .page-header-label {
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--fire);
+      margin-bottom: 0.8rem;
+      opacity: 0; animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+
+    .page-header-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.9; color: var(--paper);
+      opacity: 0; animation: fadeUp 0.8s ease 0.35s forwards;
+    }
+
+    .page-header-title span { color: var(--fire); }
+
+    .page-header-sub {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 1.1rem; color: rgba(255,255,255,0.45);
+      margin-top: 1.2rem; max-width: 480px;
+      opacity: 0; animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .page-header-meta {
+      position: absolute; bottom: 3.5rem; right: 3rem;
+      text-align: right;
+      opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+
+    .page-header-count {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem; color: var(--gold); line-height: 1;
+    }
+
+    .page-header-count-label {
+      font-size: 0.6rem; letter-spacing: 0.25em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+    }
+
+    /* ── BACK LINK ── */
+    .back-bar {
+      padding: 1.2rem 3rem;
+      border-bottom: 1px solid var(--mist);
+      display: flex; align-items: center; gap: 0.7rem;
+    }
+
+    .back-link {
+      font-size: 0.65rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--ink);
+      text-decoration: none; opacity: 0.5;
+      display: flex; align-items: center; gap: 0.5rem;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .back-link:hover { opacity: 1; color: var(--fire); }
+    .back-link::before { content: '←'; font-size: 0.9rem; }
+
+    /* ── GRID SECTION ── */
+    .grid-section {
+      padding: 4rem 3rem 6rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── PHOTO GRID ── */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Vary sizes for visual interest */
+    .photo-card:nth-child(1) { grid-column: span 2; }
+    .photo-card:nth-child(5) { grid-column: span 2; }
+    .photo-card:nth-child(9) { grid-column: span 2; }
+
+    .photo-card {
+      position: relative; overflow: hidden;
+      cursor: pointer;
+      background: var(--ink);
+    }
+
+    .photo-thumb {
+      width: 100%; aspect-ratio: 4/3;
+      display: block; overflow: hidden;
+      position: relative;
+    }
+
+    /* Wide cards get a cinematic ratio */
+    .photo-card:nth-child(1) .photo-thumb,
+    .photo-card:nth-child(5) .photo-thumb,
+    .photo-card:nth-child(9) .photo-thumb {
+      aspect-ratio: 16/9;
+    }
+
+    .photo-thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: block;
+      transition: transform 0.6s ease;
+      filter: grayscale(15%);
+    }
+
+    .photo-card:hover .photo-thumb img {
+      transform: scale(1.07);
+      filter: grayscale(0%);
+    }
+
+    /* Placeholder when no image */
+    .photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.9rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.12);
+      transition: transform 0.6s ease;
+    }
+
+    .photo-card:hover .photo-placeholder { transform: scale(1.07); }
+
+    .p1  { background: linear-gradient(135deg, #1a0f0a, #3a1f10); }
+    .p2  { background: linear-gradient(135deg, #0a0f1a, #102040); }
+    .p3  { background: linear-gradient(135deg, #0a1a0f, #103020); }
+    .p4  { background: linear-gradient(135deg, #1a1a0a, #302010); }
+    .p5  { background: linear-gradient(135deg, #1a0a1a, #301030); }
+    .p6  { background: linear-gradient(135deg, #0a1a1a, #103030); }
+    .p7  { background: linear-gradient(135deg, #1a1010, #301515); }
+    .p8  { background: linear-gradient(135deg, #101020, #151535); }
+    .p9  { background: linear-gradient(135deg, #101a10, #153015); }
+    .p10 { background: linear-gradient(135deg, #1a1500, #302500); }
+    .p11 { background: linear-gradient(135deg, #0f0f1a, #151530); }
+    .p12 { background: linear-gradient(135deg, #1a0f15, #301020); }
+
+    /* ── CARD OVERLAY ── */
+    .photo-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(13,13,13,0.92) 0%, rgba(13,13,13,0.1) 60%, transparent 100%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 1.8rem;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .photo-card:hover .photo-overlay { opacity: 1; }
+
+    .overlay-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.3em;
+      color: var(--fire); margin-bottom: 0.4rem;
+    }
+
+    .overlay-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem; letter-spacing: 0.04em;
+      color: var(--paper); line-height: 1;
+    }
+
+    .overlay-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 0.6rem;
+    }
+
+    .overlay-tag {
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+    }
+
+    .overlay-arrow {
+      width: 32px; height: 32px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--paper); font-size: 0.8rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .photo-card:hover .overlay-arrow {
+      background: var(--fire); border-color: var(--fire);
+    }
+
+    /* ── LIGHTBOX ── */
+    .lightbox {
+      position: fixed; inset: 0;
+      background: rgba(13,13,13,0.97);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox.open { opacity: 1; pointer-events: all; }
+
+    .lightbox-inner {
+      position: relative;
+      max-width: 90vw; max-height: 90vh;
+      display: flex; gap: 3rem; align-items: center;
+    }
+
+    .lightbox-img-wrap {
+      position: relative; flex-shrink: 0;
+      max-width: 65vw; max-height: 85vh;
+    }
+
+    .lightbox-img-wrap img,
+    .lightbox-img-wrap .lb-placeholder {
+      max-width: 65vw; max-height: 85vh;
+      object-fit: contain; display: block;
+    }
+
+    .lb-placeholder {
+      width: 500px; height: 400px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.12);
+    }
+
+    .lightbox-info {
+      min-width: 220px; color: var(--paper);
+    }
+
+    .lb-num {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--fire);
+      margin-bottom: 0.8rem;
+    }
+
+    .lb-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem; line-height: 1;
+      margin-bottom: 0.8rem;
+    }
+
+    .lb-desc {
+      font-size: 0.78rem; line-height: 1.8;
+      opacity: 0.5; margin-bottom: 1.5rem;
+    }
+
+    .lb-tag {
+      display: inline-block;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: rgba(255,255,255,0.5);
+      margin-bottom: 0.5rem; margin-right: 0.4rem;
+    }
+
+    .lb-close {
+      position: absolute; top: -2.5rem; right: 0;
+      background: none; border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; cursor: pointer;
+      transition: color 0.2s;
+    }
+    .lb-close:hover { color: var(--fire); }
+
+    .lb-nav {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: none; border: 1px solid rgba(255,255,255,0.2);
+      color: var(--paper); width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .lb-nav:hover { background: var(--fire); border-color: var(--fire); }
+    .lb-prev { left: -3.5rem; }
+    .lb-next { right: -3.5rem; }
+
+    /* ── CTA STRIP ── */
+    .cta-strip {
+      background: var(--fire);
+      padding: 4rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .cta-strip-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      color: var(--paper); line-height: 1;
+    }
+
+    .cta-strip-text span { color: var(--gold); }
+
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      background: var(--ink); color: var(--paper);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      border: 2px solid var(--ink); white-space: nowrap;
+    }
+    .btn:hover { background: var(--paper); color: var(--ink); transform: translate(-3px,-3px); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      padding: 1.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--paper);
+    }
+    footer p { font-size: 0.65rem; opacity: 0.3; letter-spacing: 0.15em; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .photo-grid { grid-template-columns: repeat(2, 1fr); }
+      .photo-card:nth-child(1),
+      .photo-card:nth-child(5),
+      .photo-card:nth-child(9) { grid-column: span 2; }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .page-header { padding: 6rem 1.5rem 3rem; }
+      .page-header-meta { display: none; }
+      .back-bar, .grid-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .photo-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .photo-card:nth-child(n) { grid-column: span 1; }
+      .lightbox-inner { flex-direction: column; gap: 1.5rem; }
+      .lightbox-img-wrap, .lightbox-img-wrap img { max-width: 90vw; }
+      .lb-placeholder { width: 80vw; height: 250px; }
+      .lb-prev { left: -1.5rem; }
+      .lb-next { right: -1.5rem; }
+      .cta-strip { flex-direction: column; gap: 2rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="portfolio.html" class="nav-logo">YN</a>
+    <ul class="nav-links">
+      <li><a href="portfolio.html#about">About</a></li>
+      <li><a href="works.html" class="active">Work</a></li>
+      <li><a href="portfolio.html#services">Services</a></li>
+      <li><a href="portfolio.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <p class="page-header-label">Portfolio — Photography</p>
+    <h1 class="page-header-title">All<br><span>Works</span></h1>
+    <p class="page-header-sub">A full collection of photography — candid moments, landscapes, portraits, and everything in between.</p>
+    <div class="page-header-meta">
+      <div class="page-header-count" id="photo-count">12</div>
+      <div class="page-header-count-label">Photographs</div>
+    </div>
+  </div>
+
+  <!-- BACK -->
+  <div class="back-bar">
+    <a href="portfolio.html" class="back-link">Back to Homepage</a>
+  </div>
+
+  <!-- GRID -->
+  <div class="grid-section">
+    <div class="photo-grid" id="photo-grid">
+
+      <div class="photo-card reveal" data-index="0">
+        <div class="photo-thumb">
+          <!-- Replace the div below with: <img src="your-image.jpg" alt="Photo Title"> -->
+          <div class="photo-placeholder p1">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">01</div>
+          <div class="overlay-title">Photo Title One</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Landscape · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="1">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p2">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">02</div>
+          <div class="overlay-title">Photo Title Two</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Portrait · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="2">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p3">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">03</div>
+          <div class="overlay-title">Photo Title Three</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Street · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="3">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p4">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">04</div>
+          <div class="overlay-title">Photo Title Four</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Nature · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="4">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p5">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">05</div>
+          <div class="overlay-title">Photo Title Five</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Architecture · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="5">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p6">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">06</div>
+          <div class="overlay-title">Photo Title Six</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Abstract · 2025</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="6">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p7">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">07</div>
+          <div class="overlay-title">Photo Title Seven</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Portrait · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="7">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p8">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">08</div>
+          <div class="overlay-title">Photo Title Eight</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Landscape · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="8">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p9">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">09</div>
+          <div class="overlay-title">Photo Title Nine</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Street · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="9">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p10">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">10</div>
+          <div class="overlay-title">Photo Title Ten</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Nature · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="10">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p11">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">11</div>
+          <div class="overlay-title">Photo Title Eleven</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Abstract · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="photo-card reveal" data-index="11">
+        <div class="photo-thumb">
+          <div class="photo-placeholder p12">ADD PHOTO</div>
+        </div>
+        <div class="photo-overlay">
+          <div class="overlay-num">12</div>
+          <div class="overlay-title">Photo Title Twelve</div>
+          <div class="overlay-meta">
+            <span class="overlay-tag">Architecture · 2024</span>
+            <div class="overlay-arrow">→</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-inner">
+      <button class="lb-close" id="lb-close">✕ Close</button>
+      <button class="lb-nav lb-prev" id="lb-prev">←</button>
+      <div class="lightbox-img-wrap" id="lb-img-wrap">
+        <div class="lb-placeholder p1">PHOTO PREVIEW</div>
+      </div>
+      <div class="lightbox-info">
+        <div class="lb-num" id="lb-num">01 / 12</div>
+        <div class="lb-title" id="lb-title">Photo Title</div>
+        <div class="lb-desc" id="lb-desc">Add a short description about this photograph — the story behind it, the location, the mood you were chasing.</div>
+        <div id="lb-tags">
+          <span class="lb-tag">Landscape</span>
+          <span class="lb-tag">2025</span>
+        </div>
+      </div>
+      <button class="lb-nav lb-next" id="lb-next">→</button>
+    </div>
+  </div>
+
+  <!-- CTA STRIP -->
+  <div class="cta-strip reveal">
+    <div class="cta-strip-text">Like what<br>you <span>see?</span></div>
+    <a href="portfolio.html#contact" class="btn">Get in Touch</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Your Name. All rights reserved.</p>
+    <p>Designed with intent.</p>
+  </footer>
+
+  <script>
+    // ── Cursor ──
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .photo-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(3)'; cursor.style.background = '#f5c842'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; cursor.style.background = '#e84c1e'; });
+    });
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Lightbox data ──
+    // Customize titles, descriptions, and tags for each photo here
+    const photos = [
+      { title: 'Photo Title One',    desc: 'Add a short description about this photograph.',   tags: ['Landscape', '2025'] },
+      { title: 'Photo Title Two',    desc: 'Add a short description about this photograph.',   tags: ['Portrait', '2025']  },
+      { title: 'Photo Title Three',  desc: 'Add a short description about this photograph.',   tags: ['Street', '2025']    },
+      { title: 'Photo Title Four',   desc: 'Add a short description about this photograph.',   tags: ['Nature', '2025']    },
+      { title: 'Photo Title Five',   desc: 'Add a short description about this photograph.',   tags: ['Architecture', '2025'] },
+      { title: 'Photo Title Six',    desc: 'Add a short description about this photograph.',   tags: ['Abstract', '2025']  },
+      { title: 'Photo Title Seven',  desc: 'Add a short description about this photograph.',   tags: ['Portrait', '2024']  },
+      { title: 'Photo Title Eight',  desc: 'Add a short description about this photograph.',   tags: ['Landscape', '2024'] },
+      { title: 'Photo Title Nine',   desc: 'Add a short description about this photograph.',   tags: ['Street', '2024']    },
+      { title: 'Photo Title Ten',    desc: 'Add a short description about this photograph.',   tags: ['Nature', '2024']    },
+      { title: 'Photo Title Eleven', desc: 'Add a short description about this photograph.',   tags: ['Abstract', '2024']  },
+      { title: 'Photo Title Twelve', desc: 'Add a short description about this photograph.',   tags: ['Architecture', '2024'] },
+    ];
+
+    let current = 0;
+    const lightbox  = document.getElementById('lightbox');
+    const lbImgWrap = document.getElementById('lb-img-wrap');
+    const lbNum     = document.getElementById('lb-num');
+    const lbTitle   = document.getElementById('lb-title');
+    const lbDesc    = document.getElementById('lb-desc');
+    const lbTags    = document.getElementById('lb-tags');
+
+    function openLightbox(index) {
+      current = index;
+      updateLightbox();
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updateLightbox() {
+      const p = photos[current];
+      const cards = document.querySelectorAll('.photo-card');
+      const thumbContent = cards[current].querySelector('.photo-thumb').innerHTML;
+
+      lbImgWrap.innerHTML = thumbContent;
+      // Style the placeholder/img to fill the lightbox properly
+      const img = lbImgWrap.querySelector('img');
+      if (img) {
+        img.style.maxWidth  = '65vw';
+        img.style.maxHeight = '80vh';
+        img.style.objectFit = 'contain';
+      }
+      const ph = lbImgWrap.querySelector('.photo-placeholder');
+      if (ph) {
+        ph.style.width  = '500px';
+        ph.style.height = '380px';
+      }
+
+      lbNum.textContent   = String(current + 1).padStart(2,'0') + ' / ' + String(photos.length).padStart(2,'0');
+      lbTitle.textContent = p.title;
+      lbDesc.textContent  = p.desc;
+      lbTags.innerHTML    = p.tags.map(t => `<span class="lb-tag">${t}</span>`).join('');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.photo-card').forEach((card, i) => {
+      card.addEventListener('click', () => openLightbox(i));
+    });
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('lb-prev').addEventListener('click', () => { current = (current - 1 + photos.length) % photos.length; updateLightbox(); });
+    document.getElementById('lb-next').addEventListener('click', () => { current = (current + 1) % photos.length; updateLightbox(); });
+
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft')  { current = (current - 1 + photos.length) % photos.length; updateLightbox(); }
+      if (e.key === 'ArrowRight') { current = (current + 1) % photos.length; updateLightbox(); }
+    });
+
+    // Update photo count in header
+    document.getElementById('photo-count').textContent = photos.length;
+  </script>
+</body>
+</html>
